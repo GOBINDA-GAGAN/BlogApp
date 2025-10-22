@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./configs/db.js";
 import { Status } from "./utils/statusCodes.js";
+import userRoute from "./routes/user.route.js";
 
 dotenv.config();
 
@@ -21,8 +22,7 @@ app.use(cookieParser());
 
 //Route
 
-
-
+app.use("/api/user", userRoute);
 
 // Basic-Routes
 app.get("/test", (req, res) => {
@@ -48,7 +48,7 @@ app.get("/test", (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () =>
-console.log(` 
+  console.log(` 
 ${"-".repeat(60)} 
 🚀 Server is UP & RUNNING
 🔗 URL      : http://localhost:${PORT}

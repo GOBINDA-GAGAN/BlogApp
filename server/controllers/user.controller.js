@@ -1,24 +1,73 @@
 import mongoose from "mongoose";
 import User from "../models/user.model.js";
 import { Status } from "../utils/statusCodes.js";
+import { hashPasswordGenerate } from "../utils/hashPassword.js";
 
 // Create a new user
 export const createUser = async (req, res) => {
   try {
-    const {} = req.body;
+    const {
+      fistName,
+      middleName,
+      lastName,
+      username,
+      email,
+      phoneNumber,
+      role,
+      password,
+      notification,
+      profileImage,
+      profileBanner,
+      bio,
+      location,
+      gender,
+      socialMedia,
+    } = req.body;
 
-    const createdUser = await mongoose.create();
+    const existIngUser = await User.findOne({email});
+    if (existIngUser) {
+      return res.status(Status.UNAUTHORIZED).json({
+        success:false,
+        message: "User already exist,please login with this email id",
+        error: null,
+        data: {},
+      });
+    }
+    const hashPassword=await hashPasswordGenerate(password);
+    // Create a new user
+    const createdUser = await User.create({
+      fistName,
+      middleName,
+      lastName,
+      username,
+      email,
+      phoneNumber,
+      role,
+      password:hashPassword,
+      notification,
+      profileImage,
+      profileBanner,
+      bio,
+      location,
+      gender,
+      socialMedia,
+    });
 
-    return res.status(Status.ACCEPTED).json({
+    // Return success response
+    return res.status(Status.CREATED).json({
       success: true,
-      message: "",
-      error: {},
+      message: "User created successfully",
+      error: null,
       data: createdUser,
     });
   } catch (error) {
-    return res
-      .status(Status.INTERNAL_SERVER_ERROR)
-      .json({ success: false, message: error.message });
+    // Return error response
+    return res.status(Status.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message,
+      error: error,
+      data: null,
+    });
   }
 };
 

@@ -6,7 +6,7 @@ import { createUser, loginUser } from "../controllers/user.controller.js";
 const router = express.Router();
 
 // register a new user
-router.post("/auth/register", createUser);
-router.post("/auth/login", loginUser);
+router.post("/register", createUser);
+router.post("/login", loginUser);
 
 export default router;

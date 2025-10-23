@@ -22,7 +22,7 @@ app.use(cookieParser());
 
 //Route
 
-app.use("/api/user", userRoute);
+app.use("/api/v1/user", userRoute);
 
 // Basic-Routes
 app.get("/test", (req, res) => {

@@ -6,6 +6,7 @@ const categorySchema = new mongoose.Schema(
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      require:true
     },
 
     shares: { type: Number, default: 0 },

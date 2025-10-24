@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./configs/db.js";
 import { Status } from "./utils/statusCodes.js";
 import userRoute from "./routes/user.route.js";
+import categoryRoute from "./routes/category.route.js";
 
 dotenv.config();
 
@@ -21,8 +22,8 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 //Route
-
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/category", categoryRoute);
 
 // Basic-Routes
 app.get("/test", (req, res) => {
@@ -42,6 +43,15 @@ app.get("/test", (req, res) => {
       error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
+});
+
+// 404 — Not Found handler
+app.use((req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Route not found",
+    path: req.originalUrl,
+  });
 });
 
 // Start Server

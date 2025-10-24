@@ -103,6 +103,7 @@ export const loginUser = async (req, res) => {
 
     // update last login
     user.lastLogin = new Date();
+    user.isLogin = true;
     const savedUser = await user.save();
 
     const finalUser = {
@@ -111,13 +112,14 @@ export const loginUser = async (req, res) => {
       username: savedUser.username,
       role: savedUser.role,
       token: token,
+      isLogin: savedUser.isLogin,
     };
 
     // ---- ✅ Set token in cookie ----
     res.cookie("auth_token", token, {
-      httpOnly: true,        // cannot be accessed by JS
-      secure: false,         // set true in production (https)
-      sameSite: "lax",       // reduce CSRF risk
+      httpOnly: true, // cannot be accessed by JS
+      secure: false, // set true in production (https)
+      sameSite: "lax", // reduce CSRF risk
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -127,7 +129,6 @@ export const loginUser = async (req, res) => {
       error: {},
       data: finalUser,
     });
-
   } catch (error) {
     return res
       .status(Status.INTERNAL_SERVER_ERROR)
@@ -135,3 +136,86 @@ export const loginUser = async (req, res) => {
   }
 };
 
+//@dec myProfile
+//@route GET /api/v1/users/profile
+export const getMyProfile = async (req, res) => {
+  try {
+    const  user_id  = req.user.user_id;
+    if (!user_id) {
+      return res.status(Status.NOT_FOUND).json({
+        success: false,
+        message: "Fail to fetched User profile",
+        error: {},
+        data: {},
+      });
+    }
+    const profile = await User.findById(user_id);
+    if (!profile) {
+      return res.status(Status.OK).json({
+        success: false,
+        message: " Fail to fetched User profile",
+        error: {},
+        data: {},
+      });
+    }
+    return res.status(Status.OK).json({
+      success: true,
+      message: "User profile fetched successfully",
+      error: {},
+      data: profile,
+    });
+  } catch (error) {
+    return res
+      .status(Status.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: error.message });
+  }
+};
+
+//user profile
+export const getUserprofile = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profile = await User.findById(id);
+    if (!profile) {
+      return res.status(Status.OK).json({
+        success: false,
+        message: " Fail to fetched User profile",
+        error: {},
+        data: {},
+      });
+    }
+    return res.status(Status.OK).json({
+      success: true,
+      message: "User profile fetched successfully",
+      error: {},
+      data: profile,
+    });
+  } catch (error) {
+    return res
+      .status(Status.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: error.message });
+  }
+};
+
+//logout
+export const logout = async (req, res) => {
+  try {
+    return res
+      .clearCookie("auth_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      })
+      .status(Status.OK)
+      .json({
+        success: true,
+        message: "Logged out successfully",
+      });
+  } catch (error) {
+    return res
+      .status(Status.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: error.message });
+  }
+};
+
+//
